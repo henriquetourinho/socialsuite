@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Suite by NTXA v1.2</title>
+    <title>Social Suite by NTXA v1.2.1</title>
     
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;800&family=Merriweather:wght@400;900&family=Fira+Code:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- DESIGN SYSTEM --- */
         :root {
             --primary: #1d9bf0;
             --bg-body: #000000;
@@ -27,146 +26,134 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font-ui); background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        body {
-            font-family: var(--font-ui);
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* SIDEBAR (PAINEL DE EDIÇÃO) */
-        .sidebar {
-            width: 460px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0; z-index: 20;
-        }
-
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); background: rgba(21, 32, 43, 0.95); }
+        /* PAINEL LATERAL */
+        .sidebar { width: 460px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 20; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
         .logo-area h2 { margin: 0; color: white; font-size: 1.25rem; display: flex; align-items: center; gap: 8px; }
         .version-badge { font-size: 0.65rem; background: #2c3640; color: var(--text-muted); padding: 2px 6px; border-radius: 4px; }
         .ntxa-badge { font-size: 0.55rem; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; font-weight: 800; }
-
         .sidebar-content { padding: 20px; overflow-y: auto; flex-grow: 1; }
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-sidebar); display: flex; gap: 10px; }
 
-        /* INPUTS E CONTROLES */
+        /* INPUTS */
         .project-manager { background: var(--bg-panel); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px; }
         .project-select-row { display: flex; gap: 8px; }
-        #projectSelect { flex-grow: 1; margin: 0; padding: 8px; font-size: 0.85rem; font-family: var(--font-ui); background: #15181c; color: white; border: 1px solid #333; border-radius: 4px; }
-        .btn-mini { background: var(--bg-panel); border: 1px solid var(--border); color: white; border-radius: 4px; cursor: pointer; padding: 0 12px; font-weight: bold; height: 36px; }
-        .backup-row { display: flex; gap: 15px; margin-top: 10px; font-size: 0.75rem; justify-content: flex-end; }
-        .link-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; font-weight: 500; }
-
+        #projectSelect { flex-grow: 1; padding: 8px; background: #15181c; color: white; border: 1px solid #333; border-radius: 4px; font-family: inherit; }
+        .btn-mini { background: var(--bg-panel); border: 1px solid var(--border); color: white; border-radius: 4px; cursor: pointer; padding: 0 12px; height: 36px; }
         .input-group { margin-bottom: 25px; border-bottom: 1px solid #2f3336; padding-bottom: 20px; }
         .input-label { display: block; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 10px; }
-        input[type="text"], select, input[type="color"] { width: 100%; background: var(--bg-panel); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 6px; font-size: 0.95rem; margin-bottom: 10px; font-family: var(--font-ui); }
-        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg-panel); border: 1px dashed var(--border); color: var(--text-muted); padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center; font-size: 0.9rem; margin-bottom: 10px; }
-        
+        input[type="text"], select, input[type="color"] { width: 100%; background: var(--bg-panel); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 6px; margin-bottom: 10px; font-family: inherit; }
+        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg-panel); border: 1px dashed var(--border); color: var(--text-muted); padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 0.9rem; margin-bottom: 10px; }
+
         /* TOGGLE VERIFICADO */
-        .verified-toggle { display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; cursor: pointer; }
-        .toggle-track { width: 34px; height: 18px; background: #333; border-radius: 20px; position: relative; transition: background 0.3s; }
-        .toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        .verified-toggle { display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
+        .toggle-track { width: 34px; height: 18px; background: #333; border-radius: 20px; position: relative; }
+        .toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: 0.3s; }
         input:checked + .toggle-track { background: var(--primary); }
         input:checked + .toggle-track::after { transform: translateX(16px); }
 
-        /* EDITOR DE CARDS */
+        /* EDITOR CARDS */
         .tweet-editor-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .drag-handle { cursor: grab; color: var(--text-muted); padding: 10px; font-size: 1.2rem; }
         textarea { width: 100%; background: transparent; border: none; color: white; font-family: inherit; font-size: 1rem; resize: none; min-height: 80px; outline: none; }
-        .mini-img-preview { width: 100%; height: 80px; object-fit: cover; border-radius: 6px; margin-top: 10px; border: 1px solid var(--border); }
-
-        .btn-main { flex: 1; padding: 14px; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; font-family: var(--font-ui); font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-secondary { background: #eff3f4; color: #0f1419; }
+        .btn-main { flex: 1; padding: 14px; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #eff3f4; color: #0f1419; }
 
         /* PREVIEW AREA */
-        .preview-area {
-            flex-grow: 1; background: #000;
-            background-image: radial-gradient(#222 1px, transparent 1px);
-            background-size: 20px 20px;
-            padding: 40px; overflow-y: auto;
-            display: flex; flex-wrap: wrap; gap: 40px;
-            justify-content: center; align-content: flex-start;
-        }
+        .preview-area { flex-grow: 1; background: #000; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 20px 20px; padding: 40px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 40px; justify-content: center; align-content: flex-start; }
 
-        /* DESIGN DO CARD */
-        .instagram-canvas {
-            display: flex; align-items: center; justify-content: center;
-            padding: 40px; box-sizing: border-box;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6); flex-shrink: 0;
-            background-size: cover; background-position: center;
-            overflow: hidden; position: relative; transition: transform 0.3s ease;
+        /* --- DESIGN DO CANVAS (CENTRALIZAÇÃO ABSOLUTA) --- */
+        .instagram-canvas { 
+            display: flex; 
+            flex-direction: column; /* Garante que a marca d'água não empurre o card pro lado */
+            align-items: center; 
+            justify-content: center; 
+            padding: 45px; 
+            box-sizing: border-box; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6); 
+            flex-shrink: 0; 
+            background-size: cover; 
+            background-position: center; 
+            overflow: hidden; 
+            position: relative; 
         }
-
         .ratio-square { width: 500px; height: 500px; }
         .ratio-portrait { width: 400px; height: 500px; }
         .ratio-story { width: 360px; height: 640px; }
 
-        .bg-watermark { position: absolute; bottom: 20px; font-weight: 800; font-size: 0.8rem; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 2px; pointer-events: none; z-index: 1; font-family: 'Inter', sans-serif; }
-
-        .tweet-card {
-            background: #ffffff; border-radius: 16px; padding: 25px;
-            width: 100%; height: auto; max-height: 100%;
-            color: #0f1419; box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            display: flex; flex-direction: column; position: relative; z-index: 2;
+        /* MARCA D'ÁGUA FIXA NO FUNDO */
+        .bg-watermark { 
+            position: absolute; 
+            bottom: 25px; 
+            left: 50%;
+            transform: translateX(-50%); /* Centraliza a marca d'água no fundo */
+            font-weight: 800; 
+            font-size: 0.8rem; 
+            color: rgba(255, 255, 255, 0.25); 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            pointer-events: none; 
+            z-index: 1; 
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            text-align: center;
         }
 
-        .tweet-header { display: flex; align-items: flex-start; margin-bottom: 12px; flex-shrink: 0; }
-        .profile-pic { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #eee; }
-        .user-info { display: flex; flex-direction: column; flex-grow: 1; }
-        .name { font-weight: 800; font-size: 16px; color: #0f1419; }
-        .username { color: #536471; font-size: 15px; }
+        .tweet-card { 
+            background: #ffffff; 
+            border-radius: 18px; 
+            padding: 28px; 
+            width: 100%; 
+            height: auto; 
+            max-height: 85%; /* Limita a altura para nunca bater na marca d'água */
+            color: #0f1419; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            z-index: 2; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
         
-        .verified-badge { width: 18px; height: 18px; fill: #1d9bf0; display: none; margin-top: 2px; }
-        .verified-badge.visible { display: block; }
+        .tweet-header { display: flex; align-items: flex-start; margin-bottom: 12px; }
+        .profile-pic { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #f0f0f0; }
+        .user-info { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
         
-        .custom-logo { width: 24px; height: 24px; object-fit: contain; }
-        .tweet-body { font-size: 22px; line-height: 1.4; color: #0f1419; white-space: pre-wrap; margin-bottom: 15px; overflow-wrap: break-word; }
-        .tweet-content-img { width: 100%; border-radius: 12px; border: 1px solid #cfd9de; margin-bottom: 15px; display: block; }
-        .tweet-footer { display: flex; justify-content: space-between; border-top: 1px solid #eff3f4; padding-top: 15px; color: #536471; font-size: 14px; flex-shrink: 0; }
-        .counter-pill { font-weight: bold; background: #eff3f4; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: #0f1419; }
+        /* ALINHAMENTO NOME + SELO */
+        .name-row { display: flex; align-items: center; gap: 5px; width: 100%; }
+        .name { font-weight: 800; font-size: 16px; color: #0f1419; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .username { color: #536471; font-size: 14px; margin-top: -2px; }
+        
+        .verified-badge { width: 18px; height: 18px; fill: #1d9bf0; display: none; flex-shrink: 0; }
+        .verified-badge.visible { display: inline-block; }
+        
+        .custom-logo { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; margin-left: 5px; }
+        .tweet-body { font-size: 21px; line-height: 1.45; color: #0f1419; white-space: pre-wrap; margin-bottom: 15px; font-weight: 400; }
+        .tweet-content-img { width: 100%; border-radius: 12px; border: 1px solid #cfd9de; margin-bottom: 15px; }
+        .tweet-footer { display: flex; justify-content: space-between; border-top: 1px solid #eff3f4; padding-top: 15px; color: #536471; font-size: 13px; }
+        .counter-pill { font-weight: 700; background: #f0f3f4; padding: 4px 12px; border-radius: 20px; font-size: 11px; color: #0f1419; }
 
+        /* Fontes */
         .font-inter .tweet-card { font-family: 'Inter', sans-serif; }
         .font-roboto .tweet-card { font-family: 'Roboto', sans-serif; }
         .font-serif .tweet-card { font-family: 'Merriweather', serif; }
         .font-mono .tweet-card { font-family: 'Fira Code', monospace; }
 
-        /* --- MOBILE NAVIGATION --- */
+        /* MOBILE NAV */
         .mobile-nav { display: none; }
-
         @media (max-width: 900px) {
             .sidebar-footer { display: none; }
-            .mobile-nav {
-                display: flex; position: fixed; bottom: 0; left: 0; width: 100%;
-                height: var(--nav-height); background: #000; border-top: 1px solid #333;
-                z-index: 100; justify-content: space-around; align-items: center;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            .nav-item {
-                background: none; border: none; color: #888; font-size: 0.7rem; font-weight: 700;
-                display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1;
-            }
+            .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: #000; border-top: 1px solid #333; z-index: 100; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
+            .nav-item { background: none; border: none; color: #888; font-size: 0.7rem; font-weight: 700; display: flex; flex-direction: column; align-items: center; flex: 1; }
             .nav-item.active { color: var(--primary); }
-            .nav-item span { font-size: 1.3rem; }
-
-            .sidebar {
-                width: 100%; height: calc(100vh - var(--nav-height));
-                position: absolute; top: 0; left: 0; display: flex;
-            }
-            .preview-area {
-                width: 100%; height: calc(100vh - var(--nav-height));
-                position: absolute; top: 0; left: 0; display: none; padding: 20px 10px;
-            }
+            .sidebar { width: 100%; height: calc(100vh - var(--nav-height)); position: absolute; }
+            .preview-area { width: 100%; height: calc(100vh - var(--nav-height)); position: absolute; display: none; padding: 20px 10px; }
             body.mode-preview .sidebar { display: none; }
             body.mode-preview .preview-area { display: flex; }
-
-            .instagram-canvas { transform: scale(0.8); transform-origin: top center; margin-bottom: -80px; }
+            .instagram-canvas { transform: scale(0.85); transform-origin: top center; }
         }
     </style>
 </head>
@@ -175,29 +162,19 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="logo-area">
-                <h2>Social<span style="color:var(--primary)">Suite</span> <span class="version-badge">v1.2</span></h2>
+                <h2>Social<span style="color:var(--primary)">Suite</span> <span class="version-badge">v1.2.1</span></h2>
                 <span class="ntxa-badge">by NTXA</span>
             </div>
             <div class="project-manager">
                 <div class="project-select-row">
                     <select id="projectSelect" onchange="switchProject()"></select>
                     <button class="btn-mini" onclick="createNewProject()">+</button>
-                    <button class="btn-mini" onclick="deleteProject()" style="color:var(--danger)">✕</button>
-                </div>
-                <div class="backup-row">
-                    <button class="link-btn" onclick="exportData()">💾 Backup</button>
-                    <button class="link-btn" onclick="document.getElementById('importFile').click()">📂 Abrir</button>
-                    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+                    <button class="btn-mini" onclick="deleteProject()" style="color:red">✕</button>
                 </div>
             </div>
         </div>
 
         <div class="sidebar-content">
-            <div class="input-group">
-                <span class="input-label">📌 Projeto</span>
-                <input type="text" id="projectTitle" placeholder="Nome da Thread" oninput="updateProjectName()">
-            </div>
-
             <div class="input-group">
                 <span class="input-label">🎨 Estilo & Branding</span>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
@@ -213,20 +190,15 @@
                         <option value="mono">Mono</option>
                     </select>
                 </div>
-                <input type="text" id="watermarkInput" placeholder="Marca d'água (@sua_marca)" oninput="updateState()">
-                <label class="file-upload-btn">
-                    <span id="logoStatus">Logo Personalizada (X)</span>
-                    <input type="file" style="display:none" accept="image/*" onchange="uploadCustomLogo(event)">
-                </label>
-                <button onclick="clearCustomLogo()" style="background:none; border:none; color:var(--danger); font-size:0.7rem; cursor:pointer;">Remover Logo</button>
+                <input type="text" id="watermarkInput" placeholder="Marca d'água (@seu_user)" oninput="updateState()">
             </div>
 
             <div class="input-group">
                 <span class="input-label">👤 Perfil</span>
-                <label class="file-upload-btn">📷 Foto de Perfil <input type="file" style="display:none" accept="image/*" onchange="uploadProfilePic(event)"></label>
+                <label class="file-upload-btn">📷 Foto Perfil <input type="file" style="display:none" onchange="uploadProfilePic(event)"></label>
                 <div style="display:flex; gap:10px; margin-bottom:5px;">
                     <input type="text" id="inputName" placeholder="Nome" oninput="updateState()" style="margin:0">
-                    <label class="verified-toggle" style="margin:0">
+                    <label class="verified-toggle">
                         <input type="checkbox" id="checkVerified" onchange="updateState()" style="display:none">
                         <div class="toggle-track"></div>
                     </label>
@@ -237,32 +209,31 @@
             <div class="input-group">
                 <span class="input-label">🖼️ Background</span>
                 <select id="bgType" onchange="toggleBgControls()">
-                    <option value="preset">Presets / Gradients</option>
+                    <option value="preset">Gradients & Neutros</option>
                     <option value="color">Cor Sólida</option>
-                    <option value="image">Imagem Custom</option>
+                    <option value="image">Imagem</option>
                 </select>
                 <div id="control-preset">
                     <select id="bgSelector" onchange="updateState()">
                         <option value="#f8f9fa">Off White</option>
                         <option value="linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)">Soft Grey</option>
                         <option value="#F5F5DC">Beige</option>
-                        <option value="linear-gradient(135deg, #f6d365 0%, #fda085 100%)">Sunset</option>
-                        <option value="linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)">Aqua</option>
-                        <option value="#000000">Dark OLED</option>
+                        <option value="linear-gradient(135deg, #f6d365 0%, #fda085 100%)">Laranja Sunset</option>
+                        <option value="linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)">Azul Água</option>
+                        <option value="#000000">Preto OLED</option>
                     </select>
                 </div>
                 <div id="control-color" style="display:none"><input type="color" id="bgColorPicker" oninput="updateState()"></div>
                 <div id="control-image" style="display:none"><label class="file-upload-btn">📤 Upload Fundo <input type="file" style="display:none" onchange="uploadBgImage(event)"></label></div>
             </div>
 
-            <span class="input-label">Thread / Cards</span>
+            <span class="input-label">Cards</span>
             <button class="btn-main btn-secondary" onclick="addTweet()" style="width:100%; border-radius:8px; margin-bottom:15px;">+ Novo Card</button>
             <div id="tweetsContainer"></div>
         </div>
-
+        
         <div class="sidebar-footer">
-            <button class="btn-main btn-secondary" onclick="addTweet()">+ Card</button>
-            <button class="btn-main btn-primary" onclick="downloadAllZip()">📦 Baixar Pack</button>
+            <button class="btn-main btn-primary" onclick="downloadAllZip()">📦 Baixar Pack ZIP</button>
         </div>
     </div>
 
@@ -271,29 +242,24 @@
     <div class="mobile-nav">
         <button class="nav-item active" onclick="setTab('editor')" id="tab-editor"><span>✏️</span>Editor</button>
         <button class="nav-item" onclick="setTab('preview')" id="tab-preview"><span>👁️</span>Preview</button>
-        <button class="nav-item" onclick="downloadAllZip()" style="background:var(--primary); color:white; margin:8px; border-radius:10px;"><span>📦</span>Baixar</button>
+        <button class="nav-item" onclick="downloadAllZip()" style="background:var(--primary); color:white; border-radius:8px; margin:5px;"><span>📦</span>Baixar</button>
     </div>
 
     <script>
-        // CONTROLE DE INTERFACE
-        function setTab(t) {
-            document.body.className = (t === 'editor') ? 'mode-editor' : 'mode-preview';
-            document.getElementById('tab-editor').classList.toggle('active', t === 'editor');
-            document.getElementById('tab-preview').classList.toggle('active', t === 'preview');
-        }
-
-        // DADOS E LOGICA
+        function setTab(t) { document.body.className = t==='editor'?'mode-editor':'mode-preview'; document.getElementById('tab-editor').classList.toggle('active', t==='editor'); document.getElementById('tab-preview').classList.toggle('active', t==='preview'); }
+        
         let projects = []; let currentProjectId = null;
         const STORAGE_KEY = 'socialSuite_v1_main';
 
-        const createDefault = (id, name) => ({
-            id, name, data: {
-                name: "Social Suite", username: "@by_ntxa", verified: true,
-                bgMode: "preset", bgValue: "#f8f9fa", ratio: "square", font: "inter",
-                watermark: "@social_suite", customLogo: null,
-                profilePic: "https://ui-avatars.com/api/?name=NTXA&background=000&color=fff",
-                tweets: [{ text: "Tudo funcionando!\n\nSelo verificado, fontes e branding mantidos. No celular use as abas abaixo.", img: null }]
-            }
+        const createDefault = (id, name) => ({ 
+            id, name, 
+            data: { 
+                name: "Social Suite", username: "@by_ntxa", verified: true, 
+                bgMode: "preset", bgValue: "#f8f9fa", ratio: "square", font: "inter", 
+                watermark: "@social_suite", customLogo: null, 
+                profilePic: "https://ui-avatars.com/api/?name=NTXA&background=000&color=fff", 
+                tweets: [{ text: "Centralização Absolute v1.2.1\n\nAgora o card respeita a marca d'água e se mantém no centro exato do Canvas.", img: null }] 
+            } 
         });
 
         function init() {
@@ -307,16 +273,14 @@
         function getCurrent() { return projects.find(p => p.id == currentProjectId); }
 
         function loadProject(id) {
-            const p = projects.find(x => x.id == id); if(!p) return; const d = p.data;
-            document.getElementById('projectTitle').value = p.name;
+            const p = projects.find(x => x.id == id); const d = p.data;
             document.getElementById('inputName').value = d.name;
             document.getElementById('inputUser').value = d.username;
             document.getElementById('checkVerified').checked = d.verified;
             document.getElementById('ratioSelect').value = d.ratio;
             document.getElementById('fontSelect').value = d.font;
             document.getElementById('watermarkInput').value = d.watermark;
-            document.getElementById('bgType').value = d.bgMode;
-            toggleBgControls(); renderEditor(); renderPreview();
+            renderEditor(); renderPreview();
         }
 
         function updateState() {
@@ -335,14 +299,14 @@
 
         function renderPreview() {
             const container = document.getElementById('previewContainer'); container.innerHTML = '';
-            const p = getCurrent(); const d = p.data;
+            const d = getCurrent().data;
             const date = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'short'});
             const time = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 
             d.tweets.forEach((tweet, i) => {
                 const verif = d.verified ? 'visible' : '';
                 const bg = d.bgValue.startsWith('url') ? `background-image:${d.bgValue}` : `background:${d.bgValue}`;
-                const logo = d.customLogo ? `<img src="${d.customLogo}" class="custom-logo">` : `<svg style="width:24px;height:24px;fill:#0f1419" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>`;
+                const logo = `<svg style="width:24px;height:24px;fill:#0f1419" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>`;
 
                 container.innerHTML += `
                 <div class="instagram-canvas to-capture ratio-${d.ratio} font-${d.font}" style="${bg}">
@@ -351,7 +315,10 @@
                         <div class="tweet-header">
                             <img src="${d.profilePic}" class="profile-pic">
                             <div class="user-info">
-                                <div class="name-row"><span class="name">${d.name}</span><svg class="verified-badge ${verif}" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></svg></div>
+                                <div class="name-row">
+                                    <span class="name">${d.name}</span>
+                                    <svg class="verified-badge ${verif}" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></svg>
+                                </div>
                                 <span class="username">${d.username}</span>
                             </div>
                             ${logo}
@@ -364,25 +331,19 @@
             });
         }
 
-        // AUXILIARES
         function updateProjectSelectUI() { const s = document.getElementById('projectSelect'); s.innerHTML=''; projects.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;if(p.id==currentProjectId)o.selected=true;s.appendChild(o);}); }
         function switchProject() { currentProjectId = parseInt(document.getElementById('projectSelect').value); loadProject(currentProjectId); }
         function createNewProject() { const n = prompt("Nome:"); if(n) { const p = createDefault(Date.now(), n); projects.push(p); currentProjectId = p.id; save(); updateProjectSelectUI(); loadProject(p.id); } }
         function deleteProject() { if(projects.length<=1) return; if(confirm("Apagar?")) { projects = projects.filter(x=>x.id != currentProjectId); currentProjectId=projects[0].id; save(); updateProjectSelectUI(); loadProject(currentProjectId); } }
-        function updateProjectName() { getCurrent().name = document.getElementById('projectTitle').value; save(); updateProjectSelectUI(); }
-        function uploadCustomLogo(e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=(ev)=>{getCurrent().data.customLogo=ev.target.result; save(); renderPreview();}; r.readAsDataURL(f);} }
-        function clearCustomLogo() { getCurrent().data.customLogo=null; save(); renderPreview(); }
         function uploadProfilePic(e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=(ev)=>{getCurrent().data.profilePic=ev.target.result; save(); renderPreview();}; r.readAsDataURL(f);} }
         function uploadBgImage(e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=(ev)=>{const d=getCurrent().data; d.bgValue=`url(${ev.target.result})`; d.bgMode='image'; save(); renderPreview();}; r.readAsDataURL(f);} }
         function toggleBgControls() { const m=document.getElementById('bgType').value; document.getElementById('control-preset').style.display = m==='preset'?'block':'none'; document.getElementById('control-color').style.display = m==='color'?'block':'none'; document.getElementById('control-image').style.display = m==='image'?'block':'none'; updateState(); }
-        function renderEditor() { const c=document.getElementById('tweetsContainer'); c.innerHTML=''; getCurrent().data.tweets.forEach((t, i)=>{ const el=document.createElement('div'); el.className='tweet-editor-item'; el.innerHTML=`<div class="editor-header"><span class="drag-handle">☰ Card ${i+1}</span><button onclick="deleteTweet(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer;">✕</button></div><textarea oninput="updateTweetText(${i}, this.value)">${t.text}</textarea><label class="file-upload-btn">🖼️ Imagem <input type="file" style="display:none" onchange="uploadTweetImg(${i}, event)"></label>${t.img?`<img src="${t.img}" class="mini-img-preview">`:''}`; c.appendChild(el); }); }
+        function renderEditor() { const c=document.getElementById('tweetsContainer'); c.innerHTML=''; getCurrent().data.tweets.forEach((t, i)=>{ const el=document.createElement('div'); el.className='tweet-editor-item'; el.innerHTML=`<div class="editor-header"><span class="drag-handle">☰ Card ${i+1}</span><button onclick="deleteTweet(${i})" style="color:red; border:none; background:none; cursor:pointer;">✕</button></div><textarea oninput="updateTweetText(${i}, this.value)">${t.text}</textarea><label class="file-upload-btn">🖼️ Imagem <input type="file" style="display:none" onchange="uploadTweetImg(${i}, event)"></label>${t.img?`<img src="${t.img}" class="mini-img-preview">`:''}`; c.appendChild(el); }); }
         function updateTweetText(i, v) { getCurrent().data.tweets[i].text=v; save(); renderPreview(); }
         function addTweet() { getCurrent().data.tweets.push({text:"", img:null}); renderEditor(); save(); renderPreview(); }
         function deleteTweet(i) { if(confirm("Apagar card?")) { getCurrent().data.tweets.splice(i, 1); renderEditor(); save(); renderPreview(); } }
         function uploadTweetImg(i, e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=(ev)=>{getCurrent().data.tweets[i].img=ev.target.result; renderEditor(); save(); renderPreview();}; r.readAsDataURL(f);} }
         function initSortable() { Sortable.create(document.getElementById('tweetsContainer'), { handle:'.drag-handle', animation:150, onEnd: function(evt){ const p=getCurrent().data.tweets; const item=p.splice(evt.oldIndex, 1)[0]; p.splice(evt.newIndex, 0, item); save(); renderEditor(); renderPreview(); } }); }
-        function exportData() { saveAs(new Blob([JSON.stringify(projects)], {type:"application/json"}), "social-suite-backup.json"); }
-        function importData(e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=(ev)=>{projects=JSON.parse(ev.target.result); save(); location.reload();}; r.readAsText(f);} }
         async function downloadAllZip() { const els = document.querySelectorAll('.to-capture'); const zip = new JSZip(); for(let i=0; i<els.length; i++){ const canv = await html2canvas(els[i], {scale:2, useCORS:true}); const blob = await new Promise(r=>canv.toBlob(r)); zip.file(`card_${i+1}.png`, blob); } const content = await zip.generateAsync({type:"blob"}); saveAs(content, "social-suite-pack.zip"); }
 
         init();
