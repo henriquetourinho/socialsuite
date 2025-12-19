@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Suite by NTXA v1.0</title>
+    
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Inter:wght@400;800&family=Merriweather:wght@400;900&family=Fira+Code:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- DESIGN SYSTEM --- */
+        :root {
+            --primary: #1d9bf0;
+            --danger: #f4212e;
+            --bg-body: #000000;
+            --bg-sidebar: #15202b;
+            --bg-panel: #1e2732;
+            --border: #38444d;
+            --text-main: #ffffff;
+            --text-muted: #8b98a5;
+            --font-ui: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 460px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header { 
+            padding: 20px 25px; 
+            border-bottom: 1px solid var(--border); 
+            background: rgba(21, 32, 43, 0.98);
+        }
+        
+        /* Branding NTXA */
+        .brand-title {
+            margin: 0;
+            font-size: 1.4rem;
+            color: white;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .version-badge {
+            background: rgba(29, 155, 240, 0.15);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+        }
+
+        /* Project Manager Styles */
+        .project-manager { background: var(--bg-panel); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px; }
+        .project-select-row { display: flex; gap: 8px; }
+        #projectSelect { flex-grow: 1; margin: 0; padding: 8px; font-size: 0.85rem; border-radius: 6px; border: 1px solid #333; background: #111; color: white; }
+        .btn-mini { background: #333; border: 1px solid #444; color: white; border-radius: 4px; cursor: pointer; padding: 0 12px; transition: all 0.2s; }
+        .btn-mini:hover { border-color: var(--primary); color: var(--primary); background: rgba(29, 155, 240, 0.1); }
+        .backup-row { display: flex; gap: 15px; margin-top: 10px; font-size: 0.75rem; justify-content: flex-end; padding-right: 5px; }
+        .link-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        .link-btn:hover { color: var(--primary); text-decoration: underline; }
+
+        .sidebar-content { padding: 25px; overflow-y: auto; flex-grow: 1; }
+        
+        .input-group { margin-bottom: 30px; border-bottom: 1px solid #2f3336; padding-bottom: 25px; }
+        .input-group:last-child { border-bottom: none; }
+        
+        .input-label { display: block; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 12px; }
+        
+        input[type="text"], select, input[type="color"] { 
+            width: 100%; background: var(--bg-panel); border: 1px solid var(--border); 
+            color: white; padding: 12px; border-radius: 8px; font-size: 0.95rem; 
+            margin-bottom: 10px; box-sizing: border-box; font-family: var(--font-ui);
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+
+        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg-panel); border: 1px dashed var(--border); color: var(--text-muted); padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; box-sizing: border-box; margin-bottom: 10px; text-align: center; font-size: 0.9rem; transition: all 0.2s; }
+        .file-upload-btn:hover { border-color: var(--primary); color: white; background: rgba(29, 155, 240, 0.05); }
+
+        /* Toggle */
+        .verified-toggle { display: flex; align-items: center; justify-content: space-between; background: var(--bg-panel); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; cursor: pointer; }
+        .toggle-track { width: 34px; height: 18px; background: #333; border-radius: 20px; position: relative; transition: background 0.3s; }
+        .toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        input:checked + .toggle-track { background: var(--primary); }
+        input:checked + .toggle-track::after { transform: translateX(16px); }
+
+        /* Editor Items */
+        .tweet-editor-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 15px; transition: border-color 0.2s; position: relative; }
+        .tweet-editor-item:hover { border-color: #555; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .drag-handle { cursor: grab; color: var(--text-muted); padding: 5px; font-size: 1.2rem; }
+        textarea { width: 100%; background: transparent; border: none; color: white; font-family: inherit; font-size: 1rem; resize: none; min-height: 80px; outline: none; line-height: 1.5; }
+        .mini-img-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-top: 10px; border: 1px solid var(--border); }
+
+        /* Footer */
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-sidebar); display: flex; gap: 12px; }
+        .btn-main { flex: 1; padding: 14px; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--font-ui); transition: transform 0.2s; }
+        .btn-main:hover { transform: translateY(-2px); opacity: 0.95; }
+        .btn-secondary { background: #eff3f4; color: #0f1419; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(29, 155, 240, 0.3); }
+
+        /* --- PREVIEW AREA --- */
+        .preview-area {
+            flex-grow: 1; background: #000;
+            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+            background-size: 24px 24px;
+            padding: 50px; overflow-y: auto;
+            display: flex; flex-wrap: wrap; gap: 50px;
+            justify-content: center; align-content: flex-start;
+        }
+
+        /* CANVAS */
+        .instagram-canvas {
+            display: flex; align-items: center; justify-content: center;
+            padding: 40px; box-sizing: border-box;
+            box-shadow: 0 30px 80px -10px rgba(0,0,0,0.7); flex-shrink: 0;
+            background-size: cover; background-position: center;
+            overflow: hidden; 
+            position: relative;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Formatos */
+        .ratio-square { width: 500px; height: 500px; }
+        .ratio-portrait { width: 400px; height: 500px; }
+        .ratio-story { width: 360px; height: 640px; }
+
+        /* Marca d'água no Fundo */
+        .bg-watermark {
+            position: absolute;
+            bottom: 25px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+        }
+
+        .tweet-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%; height: auto; max-height: 100%;
+            color: #0f1419;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column;
+            box-sizing: border-box; position: relative;
+            z-index: 2;
+        }
+
+        .tweet-header { display: flex; align-items: flex-start; margin-bottom: 15px; flex-shrink: 0; }
+        .profile-pic { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #eee; }
+        .user-info { display: flex; flex-direction: column; flex-grow: 1; }
+        .name-row { display: flex; align-items: center; gap: 4px; }
+        .name { font-weight: 800; font-size: 16px; color: #0f1419; }
+        .username { color: #536471; font-size: 15px; }
+        .verified-badge { width: 18px; height: 18px; fill: #1d9bf0; display: none; margin-top: 2px; }
+        .verified-badge.visible { display: block; }
+        
+        .custom-logo { width: 24px; height: 24px; object-fit: contain; }
+
+        .tweet-body { font-size: 22px; line-height: 1.45; color: #0f1419; white-space: pre-wrap; margin-bottom: 20px; overflow-wrap: break-word; }
+        .tweet-content-img { width: 100%; border-radius: 12px; border: 1px solid #cfd9de; margin-bottom: 15px; display: block; }
+        
+        .tweet-footer { display: flex; justify-content: space-between; border-top: 1px solid #eff3f4; padding-top: 15px; color: #536471; font-size: 14px; flex-shrink: 0; }
+        .counter-pill { font-weight: 700; background: #eff3f4; padding: 4px 12px; border-radius: 20px; font-size: 12px; color: #0f1419; }
+
+        /* Font Families */
+        .font-inter .tweet-card { font-family: 'Inter', sans-serif; }
+        .font-roboto .tweet-card { font-family: 'Roboto', sans-serif; }
+        .font-serif .tweet-card { font-family: 'Merriweather', serif; }
+        .font-mono .tweet-card { font-family: 'Fira Code', monospace; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Social Suite</h2>
+            <div class="brand-subtitle">
+                <span>by NTXA</span>
+                <span class="version-badge">v1.0</span>
+            </div>
+            
+            <div class="project-manager">
+                <div class="project-select-row">
+                    <select id="projectSelect" onchange="switchProject()"></select>
+                    <button class="btn-mini" onclick="createNewProject()" title="Novo">+</button>
+                    <button class="btn-mini" onclick="deleteProject()" title="Excluir" style="color:#f4212e">✕</button>
+                </div>
+                <div class="backup-row">
+                    <button class="link-btn" onclick="exportData()">⬇ Backup</button>
+                    <button class="link-btn" onclick="document.getElementById('importFile').click()">⬆ Restaurar</button>
+                    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <input type="text" id="projectTitle" placeholder="Nome do projeto..." oninput="updateProjectName()" style="border-left: 3px solid var(--primary); font-weight:bold; margin-bottom: 20px;">
+
+            <div class="input-group">
+                <span class="input-label">🎨 Branding & Formato</span>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                    <select id="ratioSelect" onchange="updateState()">
+                        <option value="square">Quadrado (1:1)</option>
+                        <option value="portrait">Portrait (4:5)</option>
+                        <option value="story">Story (9:16)</option>
+                    </select>
+                    <select id="fontSelect" onchange="updateState()">
+                        <option value="inter">Inter (Padrão)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="serif">Serif</option>
+                        <option value="mono">Mono</option>
+                    </select>
+                </div>
+
+                <input type="text" id="watermarkInput" placeholder="Marca d'água (Ex: @minha_agencia)" oninput="updateState()">
+                
+                <label class="file-upload-btn" style="padding: 10px; font-size: 0.85rem;">
+                    <span id="logoStatus">Substituir Logo X (Upload)</span>
+                    <input type="file" style="display:none" accept="image/*" onchange="uploadCustomLogo(event)">
+                </label>
+                <button onclick="clearCustomLogo()" style="background:none; border:none; color:#f4212e; font-size:0.75rem; cursor:pointer; display:block; margin: 5px 0 0 auto;">Remover Logo Personalizada</button>
+            </div>
+
+            <div class="input-group">
+                <span class="input-label">👤 Perfil</span>
+                <label class="file-upload-btn">📷 Carregar Foto <input type="file" style="display:none" accept="image/*" onchange="uploadProfilePic(event)"></label>
+                <div style="display:flex; gap:10px; margin-bottom:5px;">
+                    <input type="text" id="inputName" placeholder="Nome Exibição" oninput="updateState()" style="margin:0">
+                    <label class="verified-toggle" style="margin:0" title="Verificado"><input type="checkbox" id="checkVerified" onchange="updateState()" style="display:none"><div class="toggle-track"></div></label>
+                </div>
+                <input type="text" id="inputUser" placeholder="@usuario" oninput="updateState()">
+            </div>
+
+            <div class="input-group">
+                <span class="input-label">🖼️ Fundo</span>
+                <select id="bgType" onchange="toggleBgControls()">
+                    <option value="preset">Gradients & Neutros</option>
+                    <option value="color">Cor Sólida</option>
+                    <option value="image">Imagem Personalizada</option>
+                </select>
+                <div id="control-preset">
+                    <select id="bgSelector" onchange="updateState()">
+                        <option value="#f8f9fa">Off White</option>
+                        <option value="linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%)">Soft Grey</option>
+                        <option value="#F5F5DC">Beige</option>
+                        <option value="linear-gradient(135deg, #f6d365 0%, #fda085 100%)">Laranja Sunset</option>
+                        <option value="linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)">Azul Água</option>
+                        <option value="#000000">Preto OLED</option>
+                        <option value="linear-gradient(109.6deg, rgb(36, 45, 57) 11.2%, rgb(16, 37, 60) 51.2%, rgb(0, 0, 0) 98.6%)">Midnight Blue</option>
+                    </select>
+                </div>
+                <div id="control-color" style="display:none"><input type="color" id="bgColorPicker" value="#1d9bf0" oninput="updateState()" style="height:45px; padding:5px;"></div>
+                <div id="control-image" style="display:none"><label class="file-upload-btn">📤 Upload Imagem <input type="file" style="display:none" accept="image/*" onchange="uploadBgImage(event)"></label></div>
+            </div>
+
+            <span class="input-label">Conteúdo (Arrastar para ordenar)</span>
+            <div id="tweetsContainer"></div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="btn-main btn-secondary" onclick="addTweet()">+ Card</button>
+            <button class="btn-main btn-primary" onclick="downloadAllZip()">📦 Baixar Pack</button>
+        </div>
+    </div>
+
+    <div class="preview-area" id="previewContainer"></div>
+
+    <script>
+        // --- DATA MODEL (v1.0 Oficial) ---
+        let projects = []; let currentProjectId = null;
+        
+        const createDefaultProject = (id, name) => ({ 
+            id: id, 
+            name: name, 
+            lastModified: Date.now(), 
+            data: { 
+                name: "Sua Agência", 
+                username: "@agencia", 
+                verified: true, 
+                bgMode: "preset", 
+                bgValue: "#f8f9fa", 
+                ratio: "square", 
+                font: "inter",
+                watermark: "@social_suite", 
+                customLogo: null, 
+                profilePic: "https://ui-avatars.com/api/?name=Agencia&background=000&color=fff", 
+                tweets: [{ text: "Bem-vindo à Social Suite v1.0!\n\nA ferramenta definitiva para escalar sua produção de conteúdo.", img: null }] 
+            } 
+        });
+
+        // Chave de storage atualizada para v1
+        function init() { 
+            const saved = localStorage.getItem('socialSuite_v1_library'); 
+            if (saved) { projects = JSON.parse(saved); } else { projects = [createDefaultProject(Date.now(), "Meu Primeiro Projeto")]; } 
+            currentProjectId = projects[0].id; 
+            updateProjectSelectUI(); 
+            loadProject(currentProjectId); 
+            initSortable(); 
+        }
+
+        function saveLibrary() { localStorage.setItem('socialSuite_v1_library', JSON.stringify(projects)); }
+        function getCurrentProject() { return projects.find(p => p.id == currentProjectId); }
+        
+        // --- LOAD & UPDATE ---
+        function loadProject(id) { 
+            const proj = projects.find(p => p.id == id); if(!proj) return; 
+            const data = proj.data; 
+            
+            document.getElementById('projectTitle').value = proj.name; 
+            document.getElementById('inputName').value = data.name; 
+            document.getElementById('inputUser').value = data.username; 
+            document.getElementById('checkVerified').checked = data.verified; 
+            document.getElementById('ratioSelect').value = data.ratio || 'square';
+            document.getElementById('fontSelect').value = data.font || 'inter';
+            document.getElementById('watermarkInput').value = data.watermark || '';
+            document.getElementById('logoStatus').textContent = data.customLogo ? "Logo Carregada (Alterar)" : "Substituir Logo X (Upload)";
+
+            document.getElementById('bgType').value = data.bgMode || 'preset'; 
+            if(data.bgMode === 'preset') document.getElementById('bgSelector').value = data.bgValue; 
+            if(data.bgMode === 'color') document.getElementById('bgColorPicker').value = data.bgValue; 
+            
+            toggleBgControls(); renderEditor(); renderPreview(); 
+        }
+
+        function updateState() { 
+            const data = getCurrentProject().data; 
+            data.name = document.getElementById('inputName').value; 
+            data.username = document.getElementById('inputUser').value; 
+            data.verified = document.getElementById('checkVerified').checked; 
+            data.ratio = document.getElementById('ratioSelect').value;
+            data.font = document.getElementById('fontSelect').value;
+            data.watermark = document.getElementById('watermarkInput').value;
+
+            const mode = document.getElementById('bgType').value; 
+            data.bgMode = mode; 
+            if(mode === 'preset') data.bgValue = document.getElementById('bgSelector').value; 
+            if(mode === 'color') data.bgValue = document.getElementById('bgColorPicker').value; 
+            
+            saveLibrary(); renderPreview(); 
+        }
+
+        // --- UPLOADS ---
+        function uploadCustomLogo(e) {
+            const f = e.target.files[0];
+            if(f) { const r = new FileReader(); r.onload = (ev) => { 
+                getCurrentProject().data.customLogo = ev.target.result; 
+                document.getElementById('logoStatus').textContent = "Logo Carregada (Alterar)";
+                saveLibrary(); renderPreview(); 
+            }; r.readAsDataURL(f); }
+        }
+
+        function clearCustomLogo() {
+            getCurrentProject().data.customLogo = null;
+            document.getElementById('logoStatus').textContent = "Substituir Logo X (Upload)";
+            saveLibrary(); renderPreview();
+        }
+
+        // --- RENDER ---
+        function renderPreview() {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            const proj = getCurrentProject();
+            const data = proj.data;
+            const date = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'short'});
+            const time = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
+            const ratioClass = `ratio-${data.ratio || 'square'}`;
+            const fontClass = `font-${data.font || 'inter'}`;
+
+            data.tweets.forEach((tweet, index) => {
+                const verifiedClass = data.verified ? 'visible' : '';
+                let bgStyle = data.bgValue.startsWith('url') ? `background-image: ${data.bgValue}` : `background: ${data.bgValue}`;
+                
+                const watermarkHTML = data.watermark ? `<div class="bg-watermark">${data.watermark}</div>` : '';
+
+                let logoHTML = '';
+                if (data.customLogo) {
+                    logoHTML = `<img src="${data.customLogo}" class="custom-logo">`;
+                } else {
+                    logoHTML = `<svg style="width:24px;height:24px;fill:#0f1419" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>`;
+                }
+
+                container.innerHTML += `
+                <div class="instagram-canvas to-capture ${ratioClass} ${fontClass}" style="${bgStyle}">
+                    ${watermarkHTML}
+                    <div class="tweet-card">
+                        <div class="tweet-header">
+                            <img src="${data.profilePic}" class="profile-pic">
+                            <div class="user-info">
+                                <div class="name-row">
+                                    <span class="name">${data.name}</span>
+                                    <svg class="verified-badge ${verifiedClass}" viewBox="0 0 24 24"><g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .495.083.965.238 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></g></svg>
+                                </div>
+                                <span class="username">${data.username}</span>
+                            </div>
+                            ${logoHTML}
+                        </div>
+                        
+                        <div class="tweet-body">${tweet.text}</div>
+                        ${tweet.img ? `<img src="${tweet.img}" class="tweet-content-img">` : ''}
+                        
+                        <div class="tweet-footer">
+                            <span>${time} · ${date}</span>
+                            <span class="counter-pill">${index+1} / ${data.tweets.length}</span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // --- AUXILIARES ---
+        function updateProjectSelectUI() { const select = document.getElementById('projectSelect'); select.innerHTML = ''; projects.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name; if(p.id == currentProjectId) opt.selected = true; select.appendChild(opt); }); }
+        function switchProject() { currentProjectId = parseInt(document.getElementById('projectSelect').value); loadProject(currentProjectId); }
+        function createNewProject() { const name = prompt("Nome:", "Novo Projeto"); if(name) { const newProj = createDefaultProject(Date.now(), name); projects.push(newProj); currentProjectId = newProj.id; saveLibrary(); updateProjectSelectUI(); loadProject(currentProjectId); } }
+        function deleteProject() { if(projects.length <= 1) return; if(confirm("Excluir?")) { projects = projects.filter(p => p.id != currentProjectId); currentProjectId = projects[0].id; saveLibrary(); updateProjectSelectUI(); loadProject(currentProjectId); } }
+        function updateProjectName() { getCurrentProject().name = document.getElementById('projectTitle').value; saveLibrary(); updateProjectSelectUI(); }
+        function exportData() { saveAs(new Blob([JSON.stringify(projects)], {type: "application/json"}), "social-suite-backup.json"); }
+        function importData(event) { const file = event.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { projects = JSON.parse(e.target.result); saveLibrary(); location.reload(); } catch(err) { alert("Erro no arquivo."); } }; reader.readAsText(file); }
+        function initSortable() { Sortable.create(document.getElementById('tweetsContainer'), { handle: '.drag-handle', animation: 150, onEnd: function (evt) { const proj = getCurrentProject(); const item = proj.data.tweets.splice(evt.oldIndex, 1)[0]; proj.data.tweets.splice(evt.newIndex, 0, item); saveLibrary(); renderEditor(); renderPreview(); } }); }
+        function renderEditor() { const container = document.getElementById('tweetsContainer'); container.innerHTML = ''; getCurrentProject().data.tweets.forEach((tweet, index) => { const el = document.createElement('div'); el.className = 'tweet-editor-item'; el.innerHTML = ` <div class="editor-header"> <div style="display:flex; align-items:center; gap:10px"> <span class="drag-handle">☰</span> <span style="font-size:0.8rem; font-weight:bold; color:#888">Card ${index+1}</span> </div> <button class="btn-mini" onclick="deleteTweet(${index})" style="color:#f4212e; border:none;">✕</button> </div> <textarea oninput="updateTweetText(${index}, this.value)" placeholder="Texto...">${tweet.text}</textarea> <label class="file-upload-btn" style="padding:6px; margin-top:10px; font-size:0.8rem"> ${tweet.img ? 'Trocar Imagem' : 'Adicionar Imagem'} <input type="file" style="display:none" accept="image/*" onchange="uploadTweetImg(${index}, event)"> </label> ${tweet.img ? `<img src="${tweet.img}" class="mini-img-preview"><button onclick="removeTweetImg(${index})" style="color:red; background:none; border:none; margin-top:5px; cursor:pointer; font-size:0.8rem">Remover</button>` : ''} `; container.appendChild(el); }); }
+        function updateTweetText(i, val) { getCurrentProject().data.tweets[i].text = val; saveLibrary(); renderPreview(); }
+        function addTweet() { getCurrentProject().data.tweets.push({text:"", img:null}); renderEditor(); saveLibrary(); renderPreview(); }
+        function deleteTweet(i) { if(confirm("Apagar?")) { getCurrentProject().data.tweets.splice(i, 1); renderEditor(); saveLibrary(); renderPreview(); } }
+        function uploadProfilePic(e) { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onload = (ev) => { getCurrentProject().data.profilePic = ev.target.result; saveLibrary(); renderPreview(); }; r.readAsDataURL(f); } }
+        function uploadBgImage(e) { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onload = (ev) => { const d = getCurrentProject().data; d.bgValue = `url(${ev.target.result})`; d.bgMode = 'image'; saveLibrary(); renderPreview(); }; r.readAsDataURL(f); } }
+        function uploadTweetImg(i, e) { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onload = (ev) => { getCurrentProject().data.tweets[i].img = ev.target.result; renderEditor(); saveLibrary(); renderPreview(); }; r.readAsDataURL(f); } }
+        function removeTweetImg(i) { getCurrentProject().data.tweets[i].img = null; renderEditor(); saveLibrary(); renderPreview(); }
+        function toggleBgControls() { const mode = document.getElementById('bgType').value; document.getElementById('control-preset').style.display = mode === 'preset' ? 'block' : 'none'; document.getElementById('control-color').style.display = mode === 'color' ? 'block' : 'none'; document.getElementById('control-image').style.display = mode === 'image' ? 'block' : 'none'; updateState(); }
+        async function downloadAllZip() { const els = document.querySelectorAll('.to-capture'); const btn = document.querySelector('.btn-primary'); const oldHtml = btn.innerHTML; btn.innerHTML = "⏳ ..."; btn.disabled = true; const zip = new JSZip(); try { const promises = Array.from(els).map(async (el, i) => { const canvas = await html2canvas(el, {scale:2, useCORS:true, allowTaint:true}); return new Promise(r => canvas.toBlob(b => { zip.file(`post_${i+1}.png`, b); r(); })); }); await Promise.all(promises); const safeName = getCurrentProject().name.replace(/[^a-z0-9]/gi, '_').toLowerCase(); saveAs(await zip.generateAsync({type:"blob"}), `${safeName}.zip`); } catch(e) { alert("Erro ao baixar"); } btn.innerHTML = oldHtml; btn.disabled = false; }
+
+        init();
+    </script>
+</body>
+</html>

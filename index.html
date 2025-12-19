@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Suite by NTXA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #020204;
+            --bg-secondary: #0A0A0A;
+            --primary: #1d9bf0;
+            --primary-dark: #167ac0;
+            --accent: #7928ca;
+            --text-main: #ffffff;
+            --text-muted: #9CA3AF;
+            
+            /* Glassmorphism refinado */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(20px);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- BACKGROUND FX --- */
+        .ambient-light {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(29, 155, 240, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(121, 40, 202, 0.15) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- UTILS --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .section-padding { padding: 120px 0; }
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-primary-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- NAVBAR --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 100;
+            background: rgba(2, 2, 4, 0.8);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: white; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .logo-highlight { color: var(--primary); }
+        .by-ntxa-badge { 
+            font-size: 0.6rem; 
+            background: rgba(255,255,255,0.1); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            margin-left: 8px; 
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
+        .nav-links a:hover { color: white; }
+
+        .btn-suite {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; padding: 12px 24px; border-radius: 8px;
+            font-weight: 700; text-decoration: none; transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(29, 155, 240, 0.3);
+        }
+        .btn-suite:hover { box-shadow: 0 8px 30px rgba(29, 155, 240, 0.5); transform: translateY(-2px); }
+
+        /* --- HERO SECTION --- */
+        .hero { padding-top: 180px; text-align: center; padding-bottom: 100px; }
+
+        h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 25px; font-weight: 800; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 50px; }
+
+        .cta-group { display: flex; gap: 20px; justify-content: center; margin-bottom: 80px; }
+        .btn-hero-primary {
+            background: white; color: black; padding: 16px 40px; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 700; text-decoration: none; transition: all 0.3s;
+        }
+        .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+
+        /* Interface Mockup (CSS puro mais complexo) */
+        .hero-interface-container {
+            position: relative;
+            perspective: 1000px;
+            margin-top: -40px;
+        }
+        
+        .interface-mockup {
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+            aspect-ratio: 16/9;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 50px 100px -30px rgba(0,0,0,0.8);
+            transform: rotateX(10deg) scale(0.9);
+            transition: transform 0.5s ease-out;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+        }
+        .interface-mockup:hover { transform: rotateX(0deg) scale(1); }
+
+        .mockup-sidebar { width: 220px; background: rgba(255,255,255,0.02); border-right: 1px solid var(--glass-border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .mockup-main { flex: 1; background: radial-gradient(circle at center, #1a1a1a 0%, #0A0A0A 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+        
+        /* Elementos decorativos do mockup */
+        .skeleton-btn { height: 36px; background: var(--primary); opacity: 0.2; border-radius: 8px; width: 100%; }
+        .skeleton-line { height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; margin-bottom: 10px; }
+        
+        .layered-card {
+            width: 320px; height: 380px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 20px;
+            position: absolute;
+            box-shadow: -30px 30px 60px rgba(0,0,0,0.5);
+            z-index: 2;
+            padding: 30px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .layered-card.secondary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            z-index: 1;
+            transform: translate(60px, -40px) scale(0.9);
+            opacity: 0.6;
+        }
+
+        /* --- SEÇÃO: COMO FUNCIONA --- */
+        .steps-section { background: var(--bg-secondary); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 20px; }
+        .section-subtitle { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; text-align: center; }
+        .step-card { position: relative; padding: 40px 20px; }
+        .step-number { font-size: 6rem; font-weight: 800; position: absolute; top: 0; left: 50%; transform: translateX(-50%); opacity: 0.05; z-index: 0; background: linear-gradient(to bottom, #fff, transparent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .step-icon { font-size: 3rem; margin-bottom: 25px; position: relative; z-index: 1; display: inline-block; background: var(--glass-bg); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); }
+        .step-card h3 { font-size: 1.5rem; margin-bottom: 15px; position: relative; z-index: 1; }
+        .step-card p { color: var(--text-muted); position: relative; z-index: 1; }
+
+        /* --- SEÇÃO: RECURSOS --- */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .feature-card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            padding: 40px; border-radius: 24px; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .feature-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(29, 155, 240, 0.1), transparent 60%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover::before { opacity: 1; }
+        
+        .feature-icon { font-size: 2.5rem; margin-bottom: 25px; color: var(--primary); }
+        .feature-card h3 { font-size: 1.35rem; margin-bottom: 15px; }
+        .feature-card p { color: var(--text-muted); line-height: 1.7; }
+
+        /* --- CTA BANNER FINAL --- */
+        .cta-banner { margin: 120px 0; text-align: center; padding: 100px 0; background: linear-gradient(135deg, rgba(29, 155, 240, 0.1), rgba(121, 40, 202, 0.1)); border-radius: 30px; border: 1px solid var(--glass-border); position: relative; overflow: hidden; }
+        .cta-banner h2 { font-size: 3rem; margin-bottom: 30px; }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--bg-secondary);
+            padding: 80px 0 40px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 80px; }
+        .footer-brand p { color: var(--text-muted); margin-top: 20px; max-width: 300px; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 25px; color: white; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 15px; }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-col ul li a:hover { color: var(--primary); }
+
+        .footer-credits {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .ntxa-highlight { color: white; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .nav-links { display: none; }
+            .steps-grid { grid-template-columns: 1fr; gap: 60px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+            .footer-brand p { margin: 20px auto; }
+            .hero-interface-container { display: none; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <nav>
+        <a href="#" class="logo">Social<span class="logo-highlight">Suite</span> <span class="by-ntxa-badge">by NTXA</span></a>
+        <div class="nav-links">
+            <a href="#features">Recursos</a>
+            <a href="#how">Como Funciona</a>
+            <a href="#pricing">Enterprise</a>
+        </div>
+        <a href="/suite" class="btn-suite">Acessar Suíte</a>
+    </nav>
+
+    <section class="hero container">
+        <h1><span class="text-gradient">Crie Conteúdo Viral.</span><br><span class="text-primary-gradient">Em Velocidade Recorde.</span></h1>
+        <p class="hero-subtitle">A Social Suite by NTXA é a ferramenta criativa definitiva para agências e creators. Transforme ideias em carrosséis multiplataforma com design de alto nível.</p>
+        
+        <div class="cta-group">
+            <a href="/suite" class="btn-hero-primary">Começar a Criar Agora</a>
+        </div>
+
+        <div class="hero-interface-container">
+            <div class="interface-mockup">
+                <div class="mockup-sidebar">
+                    <div style="display:flex; gap:8px; margin-bottom:20px">
+                        <div style="width:10px; height:10px; background:#f4212e; border-radius:50%"></div>
+                        <div style="width:10px; height:10px; background:#f6d365; border-radius:50%"></div>
+                        <div style="width:10px; height:10px; background:#00ba7c; border-radius:50%"></div>
+                    </div>
+                    <div class="skeleton-btn" style="opacity: 0.4"></div>
+                    <div class="skeleton-line" style="width: 60%; margin-top: 20px"></div>
+                    <div class="skeleton-line" style="width: 80%"></div>
+                    <div class="skeleton-line" style="width: 50%"></div>
+                </div>
+                <div class="mockup-main">
+                    <div class="layered-card secondary"></div>
+                    <div class="layered-card">
+                        <div style="background:white; height:100%; border-radius:12px; padding:25px;">
+                            <div style="height:40px; width:40px; background:#eee; border-radius:50%; margin-bottom:15px;"></div>
+                            <div style="height:12px; width:90%; background:#eee; border-radius:6px; margin-bottom:8px;"></div>
+                            <div style="height:12px; width:70%; background:#eee; border-radius:6px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how" class="section-padding steps-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Fluxo de Trabalho <span class="text-primary-gradient">Otimizado</span></h2>
+                <p class="section-subtitle">Elimine gargalos na produção de conteúdo. Do rascunho ao ativo final em três passos simples.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📝</div>
+                    <h3>Escreva & Estruture</h3>
+                    <p>Digite seu conteúdo em blocos. Use arraste-e-solte para organizar a narrativa da sua thread.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🎨</div>
+                    <h3>Personalize a Marca</h3>
+                    <p>Aplique sua identidade visual. Logo, cores, tipografia e formato (Feed/Story) em segundos.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🚀</div>
+                    <h3>Exporte & Publique</h3>
+                    <p>Baixe o pacote ZIP com todas as lâminas em alta resolução, prontas para o upload.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="section-padding container">
+        <div class="section-header">
+            <h2 class="section-title">Poder de <span class="text-primary-gradient">Enterprise</span></h2>
+            <p class="section-subtitle">Ferramentas robustas projetadas para escalar a produção de conteúdo de agências e times de marketing.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3>Branding White-Label</h3>
+                <p>Sua marca em primeiro lugar. Remova logos de terceiros, adicione a sua e insira marcas d'água personalizadas para proteção de ativos.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📂</div>
+                <h3>Biblioteca de Projetos</h3>
+                <p>Gerencie múltiplos clientes ou campanhas. Alterne entre projetos instantaneamente com salvamento automático local.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Adaptação Multi-Formato</h3>
+                <p>Um clique para transformar seu conteúdo entre Quadrado (1:1), Portrait (4:5) para maior alcance, e Fullscreen Stories (9:16).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✨</div>
+                <h3>Estética Premium</h3>
+                <p>Acesso a uma curadoria de gradientes modernos, cores neutras "aesthetic" e tipografia profissional (Inter, Roboto, Serif).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Privacidade Absoluta</h3>
+                <p>Arquitetura "Local-First". Seus dados e rascunhos nunca saem do seu navegador. Segurança total para informações sensíveis.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Performance Nativa</h3>
+                <p>Construído com tecnologias web modernas para ser extremamente leve, rápido e responsivo em qualquer dispositivo.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="cta-banner">
+            <h2>Pronto para elevar seu conteúdo?</h2>
+            <p style="color:var(--text-muted); margin-bottom: 30px;">Junte-se a criadores que produzem 10x mais rápido.</p>
+            <a href="/suite" class="btn-suite" style="padding: 16px 40px; font-size: 1.1rem;">Acessar a Suíte Agora</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo" style="font-size: 1.8rem;">Social<span class="logo-highlight">Suite</span></a>
+                    <p>A suíte de criação de conteúdo mais rápida para agências modernas e criadores de alto desempenho.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Produto</h4>
+                    <ul>
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#how">Fluxo de Trabalho</a></li>
+                        <li><a href="/suite">Acessar Suíte</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Empresa</h4>
+                    <ul>
+                        <li><a href="#">Sobre Nós</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-credits">
+                <p>© 2025 Social Suite by NTXA. Desenvolvido por <span class="ntxa-highlight">NTXA</span>. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
